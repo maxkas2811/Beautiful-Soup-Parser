@@ -1,0 +1,64 @@
+ #Midterm code by Maximilian Kasvin to demonstrate beautiful soup
+import requests
+from bs4 import BeautifulSoup #imports necessary modules for Beautiful Soup to work
+
+#Example 1 Finding tag within Html file
+print("Enter exit to stop entering requests ")  #tells the user to type exit in order to exit the loop
+
+website_1 = "https://www.crummy.com/software/BeautifulSoup/bs4/doc/"  #uses the website for Beautifulsoup's documentation for the html file
+website_html_1 = requests.get(website_1) #gets the html information from the site
+final_doc_1 = BeautifulSoup(website_html_1.text, "html.parser") #runs that informations through beautiful soup and parses it
+user_input = "" #initializes user input
+while user_input != "exit": #runs the loop until exit is typed
+    user_input = input("Enter a tag you want to find within the html code ") #Requests the user to input a tag to search for
+    if final_doc_1.find_all(user_input) == "[]": #if there is not such tag and the find_all method returns "[]"
+        print("that tag is not present, try again ") #then tells the user the tag isn't there
+    else:
+        print(final_doc_1.find_all(user_input)) #if it is there then it produces the find_all methods findings
+
+    
+    
+#Example 2 Counting number of instances a requested word or number is found
+print("Enter exit to stop entering requests ") #tells the user to type exit in order to exit the loop
+
+website_2 = "https://www.crummy.com/software/BeautifulSoup/bs4/doc/" #uses the website for Beautifulsoup's documentation for the html file
+
+website_html_2 = requests.get(website_2)  #gets the html information from the site
+final_doc_2 = BeautifulSoup(website_html_2.text, "html.parser")  #runs that informations through beautiful soup and parses it
+stringed_doc = final_doc_2.prettify() #turns the site into a string to be run through using the prettify method
+user_request = input("Enter what word you want to know how many times it was used ") #asks the user for a word to chech for
+
+while user_request != "exit": #runs the loop until exit is typed
+    if user_request in stringed_doc: #if the word is in the website
+        total_times = stringed_doc.count(user_request) #counts the total times that word appears
+        print(f"that word or number appears {total_times} times") #displays that number to the user
+    elif user_request not in stringed_doc: #if the word is not in the doc
+        print("that word or number doesn't appear on the site try again") #tell the user
+    user_request = input("Enter what word you want to know how many times it was used ") #loop the request for an input
+    
+    #Example 3 Running Total of Prices on Newegg product pages
+print("Enter exit to stop entering urls") #tells the user to type exit in order to exit the loop
+user_input_url = input("Copy and Paste a url from a NewEgg product page using Ctrl+Shift+V") #Instructs the user to copy and paste the URLs of NewEgg product pages using a specific command into the terminal
+check_url = "https" #iniitalizes a check to see if it is a valid url
+check_newegg = "newegg" #iniitializes a check to see if the url is from newegg
+total_price = 0; #initializes the total price variable
+
+while user_input_url != "exit": #runs the loop until exit is typed
+    if check_url not in user_input_url: #if the input does not contain https then tell the user to try again
+        print("that is not a website url, try again") 
+        user_input_url = input("Copy and Paste a url from NewEgg ")
+    elif check_newegg not in user_input_url: #if the input is not a newegg url then tell the user to try again
+        print("that url is not from newegg, try again")
+        user_input_url = input("Copy and Paste a url from NewEgg ")
+    else: #proceeds to the rest of the code if it passes all those checks
+        website_3 = requests.get(user_input_url)  #gets the html information from the site
+        website_doc = BeautifulSoup(website_3.text, "html.parser")  #runs that informations through beautiful soup and parses it
+        site_prices = website_doc.find_all(text="$") #finds any text that begins with a dollar sign
+        parent = site_prices[0].parent #seeks the parent character of the $
+        strong = parent.find("strong") #then seeks to find the strong tag, thus leading to the main price on the page
+        single_price = strong.string #sets that main price as a string
+        total_price += int(single_price) #then adds that price to the running total by converting it into an integer
+        print(f"The price of that item is ${single_price}") #displays the price of that item
+        user_input_url = input("Copy and Paste a url from NewEgg ") #asks the user for another product page
+        
+print(f"the final price of all the items is ${total_price} ") #displays the final total price
